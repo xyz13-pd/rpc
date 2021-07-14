@@ -6,7 +6,7 @@
   "authors": [],
   "require": {
     "php": ">=8.0",
-    "inisire/data-object-bundle": "dev-master",
+    "inisire/data-object": "dev-master",
     "symfony/framework-bundle": "5.2.*",
     "symfony/messenger": "5.2.*",
     "doctrine/annotations": "^1.0"

@@ -3,15 +3,11 @@ services:
     autowire: true
     autoconfigure: true
 
-#  _instanceof:
-#    inisire\CQRS\RPC\RemoteProcedureDeclarationInterface:
-#      tags: ['cqrs.rpc']
-
   inisire\CQRS\:
     resource: '../../'
 
-#  inisire\DataObject\:
-#    resource: '../../../../data-object/src/'
+  inisire\DataObject\:
+    resource: '../../../../data-object/src/'
 
   inisire\CQRS\RPC\RouteLoader:
     arguments: [ !tagged_locator { tag: 'messenger.message_handler' } ]
