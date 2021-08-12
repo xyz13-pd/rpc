@@ -3,7 +3,9 @@
 
 namespace inisire\CQRS\Result;
 
-
+/**
+ * @template T
+ */
 class SuccessResult implements ResultInterface
 {
     private mixed $data;
@@ -14,7 +16,7 @@ class SuccessResult implements ResultInterface
     }
 
     /**
-     * @return mixed
+     * @return T
      */
     public function getData(): mixed
     {

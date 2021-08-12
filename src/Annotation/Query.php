@@ -16,4 +16,5 @@ class Query
     public Definition $output;
     public array $tags = [];
     public string $description = "";
+    public array $methods = ['GET'];
 }

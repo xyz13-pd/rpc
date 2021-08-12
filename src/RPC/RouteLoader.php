@@ -45,8 +45,8 @@ class RouteLoader extends Loader implements RouteLoaderInterface
             $reflection = new \ReflectionClass($instance);
 
             $annotations = [];
-            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                foreach ($this->annotationReader->getMethodAnnotations($method) as $annotation) {
+            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $methods) {
+                foreach ($this->annotationReader->getMethodAnnotations($methods) as $annotation) {
                     if ($annotation instanceof Query || $annotation instanceof Command) {
                         $annotations[] = $annotation;
                     }
@@ -60,19 +60,19 @@ class RouteLoader extends Loader implements RouteLoaderInterface
                         '_controller' => BusBridgeController::class,
                         '_schema' => serialize($annotation)
                     ];
-                    $method = 'GET';
+                    $methods = $annotation->methods;
                 } elseif ($annotation instanceof Command) {
                     $name = $annotation->name ?? $annotation->path;
                     $defaults = [
                         '_controller' => BusBridgeController::class,
                         '_schema' => serialize($annotation)
                     ];
-                    $method = 'POST';
+                    $methods = ['POST'];
                 } else {
                     continue;
                 }
 
-                $collection->add($name, new Route($annotation->path, $defaults, [], [], null, [], [$method]));
+                $collection->add($name, new Route($annotation->path, $defaults, [], [], null, [], $methods));
             }
         }
 
