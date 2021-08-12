@@ -45,6 +45,7 @@ class BusBridgeController extends AbstractController
         if ($request->getMethod() === 'GET') {
             $data = $request->query->all();
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'json') {
+            // TODO: Check json errors
             $data = json_decode($request->getContent(), true);
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'form') {
             $data = $request->request->all();
