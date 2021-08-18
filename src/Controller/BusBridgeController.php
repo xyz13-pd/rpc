@@ -4,11 +4,13 @@
 namespace inisire\CQRS\Controller;
 
 
-use inisire\CQRS\Annotation\Command;
-use inisire\CQRS\Annotation\Query;
+use inisire\CQRS\Annotation\RPC;
+use inisire\CQRS\Result\Data\StreamData;
 use inisire\CQRS\Result\ErrorResult;
+use inisire\CQRS\Schema\FormData;
+use inisire\CQRS\Schema\Json;
+use inisire\CQRS\Schema\Stream;
 use inisire\DataObject\Error\Error;
-use inisire\DataObject\Error\ErrorInterface;
 use inisire\DataObject\Error\ValidationError;
 use inisire\DataObject\Serializer\ObjectReferenceSerializer;
 use inisire\DataObject\Util\DataMapper;
@@ -16,6 +18,7 @@ use inisire\DataObject\Util\DataTransformer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -49,16 +52,24 @@ class BusBridgeController extends AbstractController
             $data = json_decode($request->getContent(), true);
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'form') {
             $data = $request->request->all();
+        } elseif ($request->getMethod() === 'POST') {
+            $data = array_merge($request->request->all(), $request->files->all());
         } else {
             $data = [];
         }
 
         $errors = [];
 
-        /** @var Command|Query $schema */
+        /**
+         * @var RPC $schema
+         */
         $schema = unserialize($request->attributes->get('_schema'));
 
-        $command = $this->mapper->object($schema->input, $data, $errors);
+        if ($schema->input instanceof Json || $schema->input instanceof FormData) {
+            $command = $this->mapper->object($schema->input->schema, $data, $errors);
+        } else {
+            throw new \RuntimeException(sprintf('RPC "%s" should contain input schema', $schema->path));
+        }
 
         try {
             if (count($errors) === 0) {
@@ -76,10 +87,31 @@ class BusBridgeController extends AbstractController
         foreach ($result->getErrors() as $error) {
             $errors[] = $error->toArray();
         }
-
-        return new JsonResponse([
-            'data' => $result->getData() !== null ? $this->transformer->any($result->getData(), $schema->output) : null,
-            'errors' => $errors
-        ]);
+        
+        if ($schema->output instanceof Json) {
+            $response = new JsonResponse([
+                'data' => $result->getData() !== null ? $this->transformer->any($result->getData(), $schema->output->schema) : null,
+                'errors' => $errors
+            ]); 
+        } elseif ($schema->output instanceof Stream) {
+            $data = $result->getData();
+            if ($data instanceof StreamData) {
+                $callback = function () use ($data) {
+                    echo $data->getStream()->getContents();
+                    flush();
+                };
+                $response = new StreamedResponse(
+                    $callback,
+                    200,
+                    ['Content-Type' => $data->getMimeType()]
+                );
+            } else {
+                throw new \RuntimeException(sprintf("Invalid stream output data '%'", $data::class));
+            }
+        } else {
+            throw new \RuntimeException(sprintf("Invalid output '%'", $schema->output::class));
+        }
+        
+        return $response; 
     }
 }

@@ -5,13 +5,11 @@ namespace inisire\CQRS\RPC;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use inisire\CQRS\Annotation\Command;
-use inisire\CQRS\Annotation\Query;
+use inisire\CQRS\Annotation\RPC;
 use inisire\CQRS\Controller\BusBridgeController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -20,8 +18,9 @@ class RouteLoader extends Loader implements RouteLoaderInterface
     private ServiceLocator $container;
     private AnnotationReader $annotationReader;
 
-    public function __construct(ServiceLocator $container)
+    public function __construct(ServiceLocator $container, string $env = null)
     {
+        parent::__construct($env);
         $this->container = $container;
         $this->annotationReader = new AnnotationReader();
     }
@@ -47,27 +46,20 @@ class RouteLoader extends Loader implements RouteLoaderInterface
             $annotations = [];
             foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $methods) {
                 foreach ($this->annotationReader->getMethodAnnotations($methods) as $annotation) {
-                    if ($annotation instanceof Query || $annotation instanceof Command) {
+                    if ($annotation instanceof RPC) {
                         $annotations[] = $annotation;
                     }
                 }
             }
 
             foreach ($annotations as $annotation) {
-                if ($annotation instanceof Query) {
+                if ($annotation instanceof RPC) {
                     $name = $annotation->name ?? $annotation->path;
                     $defaults = [
                         '_controller' => BusBridgeController::class,
                         '_schema' => serialize($annotation)
                     ];
                     $methods = $annotation->methods;
-                } elseif ($annotation instanceof Command) {
-                    $name = $annotation->name ?? $annotation->path;
-                    $defaults = [
-                        '_controller' => BusBridgeController::class,
-                        '_schema' => serialize($annotation)
-                    ];
-                    $methods = ['POST'];
                 } else {
                     continue;
                 }

@@ -4,7 +4,7 @@ services:
     autoconfigure: true
 
   inisire\CQRS\:
-    resource: '../../'
+    resource: '../../../src/*'
 
   inisire\DataObject\:
     resource: '../../../../data-object/src/'
