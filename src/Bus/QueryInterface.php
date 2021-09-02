@@ -4,6 +4,6 @@
 namespace inisire\CQRS\Bus;
 
 
-interface QueryInterface
+interface QueryInterface extends CommandInterface
 {
 }

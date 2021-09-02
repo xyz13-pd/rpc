@@ -4,28 +4,32 @@
 namespace inisire\CQRS\Bus;
 
 
+
+use inisire\CQRS\Error\ValidationError;
 use inisire\CQRS\Result\ResultInterface;
-use Psr\Container\ContainerInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Component\Messenger\Exception\ValidationFailedException;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
-class CommandBus implements ServiceSubscriberInterface
+class CommandBus
 {
-    private ContainerInterface $locator;
+    private MessageBusInterface $bus;
 
-    public function __construct(ContainerInterface $locator)
+    public function __construct(MessageBusInterface $bus)
     {
-        $this->locator = $locator;
+        $this->bus = $bus;
     }
 
     public function execute(CommandInterface $command): ResultInterface
     {
+        try {
+            $envelope = $this->bus->dispatch($command);
+            $handledStamp = $envelope->last(HandledStamp::class);
+            $result = $handledStamp->getResult();
+        } catch (ValidationFailedException $exception) {
+            $result = ValidationError::createByViolations($exception->getViolations());
+        }
 
-    }
-
-    public static function getSubscribedServices()
-    {
-        return [
-            CommandHandlerInterface::class
-        ];
+        return $result;
     }
 }

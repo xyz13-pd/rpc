@@ -9,6 +9,6 @@ services:
   inisire\DataObject\:
     resource: '../../../../data-object/src/'
 
-  inisire\CQRS\RPC\RouteLoader:
+  inisire\CQRS\Loader\RouteLoader:
     arguments: [ !tagged_locator { tag: 'messenger.message_handler' } ]
     tags: ['routing.loader']

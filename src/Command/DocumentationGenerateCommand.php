@@ -12,9 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 
-class OpenApiGenerateCommand extends Command
+class DocumentationGenerateCommand extends Command
 {
-    protected static $defaultName = 'inisire:openapi:generate';
+    protected static $defaultName = 'cqrs:documentation:generate';
 
     private RouterInterface $router;
 
@@ -45,7 +45,7 @@ class OpenApiGenerateCommand extends Command
             }
         }
 
-        $content = json_encode($generator->getDoc(), JSON_PRETTY_PRINT);
+        $content = json_encode($generator->getDoc(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         file_put_contents('swagger.json', $content);
 
         echo $content . PHP_EOL;

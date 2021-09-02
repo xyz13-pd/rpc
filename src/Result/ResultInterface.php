@@ -4,14 +4,21 @@
 namespace inisire\CQRS\Result;
 
 
-use inisire\DataObject\Error\ErrorInterface;
+use inisire\CQRS\Result\Metadata\Metadata;
+
 
 interface ResultInterface
 {
-    public function getData();
+    public function getMetadata(): Metadata;
+
+    public function getExitCode(): int;
 
     /**
-     * @return array<ErrorInterface>
+     * @template A
+     *
+     * @param ?class-string<A> $class
+     *
+     * @return ?A
      */
-    public function getErrors(): iterable;
+    public function getData(string $class = null);
 }
