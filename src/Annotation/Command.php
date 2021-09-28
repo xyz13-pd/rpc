@@ -8,11 +8,7 @@ use inisire\DataObject\Definition\Definition;
 /**
  * @Annotation
  */
-class Command
+class Command extends RPC
 {
-    public string $path;
-    public Definition $input;
-    public Definition $output;
-    public array $tags = [];
-    public string $description = "";
+    public array $methods = ['POST'];
 }
