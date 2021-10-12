@@ -1,5 +1,5 @@
 {
-  "name": "inisire/cqrs",
+  "name": "inisire/rpc",
   "type": "library",
   "description": "",
   "keywords": [],
@@ -13,7 +13,7 @@
   },
   "autoload": {
     "psr-4": {
-      "inisire\\CQRS\\": "src/"
+      "inisire\\RPC\\": "src/"
     }
   },
   "minimum-stability": "dev"
