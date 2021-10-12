@@ -1,12 +1,12 @@
 <?php
 
 
-namespace inisire\CQRS\Bus;
+namespace inisire\RPC\Bus;
 
 
 
-use inisire\CQRS\Error\ValidationError;
-use inisire\CQRS\Result\ResultInterface;
+use inisire\RPC\Error\ValidationError;
+use inisire\RPC\Result\ResultInterface;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;

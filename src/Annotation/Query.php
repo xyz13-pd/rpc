@@ -1,7 +1,7 @@
 <?php
 
 
-namespace inisire\CQRS\Annotation;
+namespace inisire\RPC\Annotation;
 
 
 use inisire\DataObject\Definition\Definition;

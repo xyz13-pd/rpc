@@ -1,8 +1,8 @@
 <?php
 
-namespace inisire\CQRS\Error;
+namespace inisire\RPC\Error;
 
-use inisire\CQRS\Result\ErrorResultInterface;
+use inisire\RPC\Result\ErrorResultInterface;
 use inisire\DataObject\Error\ErrorMessage;
 
 class AccessDenied extends HttpError implements ErrorResultInterface

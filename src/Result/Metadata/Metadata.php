@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Result\Metadata;
+namespace inisire\RPC\Result\Metadata;
 
 class Metadata
 {

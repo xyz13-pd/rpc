@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Context;
+namespace inisire\RPC\Context;
 
 use Symfony\Component\HttpFoundation\Request;
 

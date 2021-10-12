@@ -1,8 +1,8 @@
 <?php
 
-namespace inisire\CQRS\Error\Serializer;
+namespace inisire\RPC\Error\Serializer;
 
-use inisire\CQRS\Error\ValidationError;
+use inisire\RPC\Error\ValidationError;
 use inisire\DataObject\Error\ErrorInterface;
 use inisire\DataObject\Error\PropertyError;
 

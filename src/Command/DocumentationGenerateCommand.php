@@ -1,10 +1,10 @@
 <?php
 
 
-namespace inisire\CQRS\Command;
+namespace inisire\RPC\Command;
 
 
-use inisire\CQRS\Annotation\RPC;
+use inisire\RPC\Annotation\RPC;
 use inisire\DataObject\Util\DocGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class DocumentationGenerateCommand extends Command
 {
-    protected static $defaultName = 'cqrs:documentation:generate';
+    protected static $defaultName = 'rpc:documentation:generate';
 
     private RouterInterface $router;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Schema;
+namespace inisire\RPC\Schema;
 
 use inisire\DataObject\Definition\Definition;
 

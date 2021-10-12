@@ -1,12 +1,12 @@
 <?php
 
 
-namespace inisire\CQRS\Loader;
+namespace inisire\RPC\Loader;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use inisire\CQRS\Annotation\RPC;
-use inisire\CQRS\Controller\BusBridgeController;
+use inisire\RPC\Annotation\RPC;
+use inisire\RPC\Controller\BusBridgeController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -73,6 +73,6 @@ class RouteLoader extends Loader implements RouteLoaderInterface
 
     public function supports($resource, string $type = null)
     {
-        return $type === 'cqrs';
+        return $type === 'rpc';
     }
 }

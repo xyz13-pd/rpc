@@ -1,8 +1,8 @@
 <?php
 
-namespace inisire\CQRS\Result;
+namespace inisire\RPC\Result;
 
-use inisire\CQRS\Http\Headers;
+use inisire\RPC\Http\Headers;
 use Psr\Http\Message\StreamInterface;
 
 class FileStreamResult extends Result

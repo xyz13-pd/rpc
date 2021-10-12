@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Result;
+namespace inisire\RPC\Result;
 
 use inisire\DataObject\Error\ErrorMessage;
 

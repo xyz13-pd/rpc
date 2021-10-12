@@ -1,12 +1,12 @@
 <?php
 
-namespace inisire\CQRS\Error;
+namespace inisire\RPC\Error;
 
 
-use inisire\CQRS\Http\Headers;
-use inisire\CQRS\Http\StatusCode;
-use inisire\CQRS\Result\ErrorResultInterface;
-use inisire\CQRS\Result\Result;
+use inisire\RPC\Http\Headers;
+use inisire\RPC\Http\StatusCode;
+use inisire\RPC\Result\ErrorResultInterface;
+use inisire\RPC\Result\Result;
 
 abstract class HttpError extends Result implements ErrorResultInterface
 {

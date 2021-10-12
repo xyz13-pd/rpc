@@ -1,7 +1,7 @@
 <?php
 
 
-namespace inisire\CQRS\DependencyInjection;
+namespace inisire\RPC\DependencyInjection;
 
 
 use Symfony\Component\Config\FileLocator;

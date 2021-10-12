@@ -1,9 +1,9 @@
 <?php
 
 
-namespace inisire\CQRS\Annotation;
+namespace inisire\RPC\Annotation;
 
-use inisire\CQRS\Schema\Schema;
+use inisire\RPC\Schema\Schema;
 
 /**
  * @Annotation

@@ -1,12 +1,12 @@
 <?php
 
 
-namespace inisire\CQRS\Controller;
+namespace inisire\RPC\Controller;
 
 
-use inisire\CQRS\Bridge\HttpBridge;
-use inisire\CQRS\Bus\CommandBus;
-use inisire\CQRS\Error\ValidationError;
+use inisire\RPC\Bridge\HttpBridge;
+use inisire\RPC\Bus\CommandBus;
+use inisire\RPC\Error\ValidationError;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -1,23 +1,23 @@
 <?php
 
-namespace inisire\CQRS\Bridge;
+namespace inisire\RPC\Bridge;
 
-use inisire\CQRS\Annotation\RPC;
-use inisire\CQRS\Bus\CommandInterface;
-use inisire\CQRS\Context\RequestContextAwareInterface;
-use inisire\CQRS\Error\HttpErrorInterface;
-use inisire\CQRS\Error\Serializer\ValidationErrorSerializer;
-use inisire\CQRS\Error\ValidationError;
-use inisire\CQRS\Result\Data\StreamData;
-use inisire\CQRS\Result\ErrorResultInterface;
-use inisire\CQRS\Result\FileStreamResult;
-use inisire\CQRS\Result\HttpAwareResultInterface;
-use inisire\CQRS\Result\ResultInterface;
-use inisire\CQRS\Result\SuccessResultInterface;
-use inisire\CQRS\Schema\FormData;
-use inisire\CQRS\Schema\Json;
-use inisire\CQRS\Schema\Schema;
-use inisire\CQRS\Schema\Stream;
+use inisire\RPC\Annotation\RPC;
+use inisire\RPC\Bus\CommandInterface;
+use inisire\RPC\Context\RequestContextAwareInterface;
+use inisire\RPC\Error\HttpErrorInterface;
+use inisire\RPC\Error\Serializer\ValidationErrorSerializer;
+use inisire\RPC\Error\ValidationError;
+use inisire\RPC\Result\Data\StreamData;
+use inisire\RPC\Result\ErrorResultInterface;
+use inisire\RPC\Result\FileStreamResult;
+use inisire\RPC\Result\HttpAwareResultInterface;
+use inisire\RPC\Result\ResultInterface;
+use inisire\RPC\Result\SuccessResultInterface;
+use inisire\RPC\Schema\FormData;
+use inisire\RPC\Schema\Json;
+use inisire\RPC\Schema\Schema;
+use inisire\RPC\Schema\Stream;
 use inisire\DataObject\Serializer\ObjectReferenceSerializer;
 use inisire\DataObject\Util\DataMapper;
 use inisire\DataObject\Util\DataTransformer;

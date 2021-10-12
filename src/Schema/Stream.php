@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Schema;
+namespace inisire\RPC\Schema;
 
 class Stream extends Schema
 {

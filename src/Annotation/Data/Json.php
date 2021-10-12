@@ -1,12 +1,12 @@
 <?php
 
-namespace inisire\CQRS\Annotation\Data;
+namespace inisire\RPC\Annotation\Data;
 
 
 /**
  * @Annotation 
  */
-class Json extends \inisire\CQRS\Schema\Json
+class Json extends \inisire\RPC\Schema\Json
 {
     public function __construct($options)
     {

@@ -3,12 +3,12 @@ services:
     autowire: true
     autoconfigure: true
 
-  inisire\CQRS\:
+  inisire\RPC\:
     resource: '../../../src/*'
 
   inisire\DataObject\:
     resource: '../../../../data-object/src/'
 
-  inisire\CQRS\Loader\RouteLoader:
+  inisire\RPC\Loader\RouteLoader:
     arguments: [ !tagged_locator { tag: 'messenger.message_handler' } ]
     tags: ['routing.loader']

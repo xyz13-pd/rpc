@@ -1,10 +1,10 @@
 <?php
 
 
-namespace inisire\CQRS\Result;
+namespace inisire\RPC\Result;
 
 
-use inisire\CQRS\Result\Metadata\Metadata;
+use inisire\RPC\Result\Metadata\Metadata;
 
 
 interface ResultInterface

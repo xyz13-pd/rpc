@@ -1,11 +1,11 @@
 <?php
 
-namespace inisire\CQRS\Annotation\Data;
+namespace inisire\RPC\Annotation\Data;
 
 /**
  * @Annotation 
  */
-class Stream extends \inisire\CQRS\Schema\Stream
+class Stream extends \inisire\RPC\Schema\Stream
 {
 
 }

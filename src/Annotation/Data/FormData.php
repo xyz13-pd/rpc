@@ -1,11 +1,11 @@
 <?php
 
-namespace inisire\CQRS\Annotation\Data;
+namespace inisire\RPC\Annotation\Data;
 
 /**
  * @Annotation 
  */
-class FormData extends \inisire\CQRS\Schema\FormData
+class FormData extends \inisire\RPC\Schema\FormData
 {
     public function __construct($options)
     {

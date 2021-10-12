@@ -1,6 +1,6 @@
 <?php
 
-namespace inisire\CQRS\Http;
+namespace inisire\RPC\Http;
 
 
 class RateLimitState extends Headers
