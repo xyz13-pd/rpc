@@ -30,7 +30,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return new RouteCollection();
     }
 
-    public function load($resource, string $type = null)
+    public function load($resource, $type = null)
     {
         $collection = new RouteCollection();
 
