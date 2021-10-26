@@ -20,7 +20,6 @@ class RouteLoader extends Loader implements RouteLoaderInterface
 
     public function __construct(ServiceLocator $container, string $env = null)
     {
-        parent::__construct($env);
         $this->container = $container;
         $this->annotationReader = new AnnotationReader();
     }
