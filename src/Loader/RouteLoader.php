@@ -71,7 +71,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return $collection;
     }
 
-    public function supports($resource, string $type = null)
+    public function supports($resource, $type = null)
     {
         return $type === 'rpc';
     }
