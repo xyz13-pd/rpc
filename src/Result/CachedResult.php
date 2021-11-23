@@ -2,7 +2,7 @@
 
 namespace inisire\RPC\Result;
 
-use inisire\CQRS\Http\Headers;
+use inisire\RPC\Http\Headers;
 
 class CachedResult extends Result
 {
