@@ -50,7 +50,7 @@ class ValidationError extends BadRequest
         foreach ($violations as $violation) {
             $errors[] = new PropertyError(
                 $violation->getPropertyPath(),
-                [new Error(new ErrorMessage($violation->getMessage()), $violation->getCode())]
+                [new Error(new ErrorMessage($violation->getMessage()), $violation->getCode() ?? '')]
             );
         }
 
