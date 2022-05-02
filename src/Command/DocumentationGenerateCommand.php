@@ -4,8 +4,10 @@
 namespace inisire\RPC\Command;
 
 
-use inisire\RPC\Annotation\RPC;
-use inisire\DataObject\Util\DocGenerator;
+use inisire\DataObject\OpenAPI\RequestSchema;
+use inisire\DataObject\OpenAPI\ResponseSchema;
+use inisire\DataObject\OpenAPI\SpecificationBuilder;
+use inisire\RPC\Schema\Entrypoint;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,24 +30,37 @@ class DocumentationGenerateCommand extends Command
     {
         $routes = $this->router->getRouteCollection();
 
-        $generator = new DocGenerator();
+        $builder = new SpecificationBuilder();
 
         foreach ($routes->getIterator() as $name => $route) {
             foreach ($route->getMethods() as $method) {
                 /**
-                 * @var RPC $schema
+                 * @var Entrypoint $entrypoint
                  */
-                $schema = unserialize($route->getDefault('_schema'));
+                $entrypoint = unserialize($route->getDefault('_schema'));
 
-                if (!$schema) {
+                if (!$entrypoint) {
                     continue;
                 }
 
-                $generator->addPath($method, $route->getPath(), $schema->input, $schema->output, $schema->tags, $schema->description);
+                $request = null;
+                $responses = [];
+
+                if ($entrypoint->input->hasSchema()) {
+                    $request = new RequestSchema($entrypoint->input->getContentType(), $entrypoint->input->getSchema());
+                }
+
+                if ($entrypoint->output->hasSchema()) {
+                    $responses[] = new ResponseSchema(200, $entrypoint->output->getContentType(), $entrypoint->output->getSchema());
+                }
+
+                $builder->addPath($method, $route->getPath(), $request, $responses, $entrypoint->tags, $entrypoint->description);
             }
         }
 
-        $content = json_encode($generator->getDoc(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $specification = $builder->getSpecification();
+
+        $content = json_encode($specification->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         file_put_contents('swagger.json', $content);
 
         echo $content . PHP_EOL;

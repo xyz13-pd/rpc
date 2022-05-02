@@ -10,5 +10,9 @@ services:
     resource: '../../../../data-object/src/'
 
   inisire\RPC\Loader\RouteLoader:
-    arguments: [ !tagged_locator { tag: 'messenger.message_handler' } ]
+    arguments: [ !tagged_locator { tag: 'rpc.command_handler' } ]
     tags: ['routing.loader']
+
+  inisire\RPC\Controller\BusBridgeController:
+    arguments:
+      $entrypoints: !tagged_locator { tag: 'rpc.command_handler' }

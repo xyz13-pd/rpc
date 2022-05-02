@@ -2,25 +2,20 @@
 
 namespace inisire\RPC\Bridge;
 
-use inisire\RPC\Annotation\RPC;
 use inisire\RPC\Bus\CommandInterface;
 use inisire\RPC\Context\RequestContextAwareInterface;
-use inisire\RPC\Error\HttpErrorInterface;
 use inisire\RPC\Error\Serializer\ValidationErrorSerializer;
 use inisire\RPC\Error\ValidationError;
-use inisire\RPC\Result\Data\StreamData;
 use inisire\RPC\Result\ErrorResultInterface;
 use inisire\RPC\Result\FileStreamResult;
-use inisire\RPC\Result\HttpAwareResultInterface;
+use inisire\RPC\Result\Result;
 use inisire\RPC\Result\ResultInterface;
 use inisire\RPC\Result\SuccessResultInterface;
-use inisire\RPC\Schema\FormData;
-use inisire\RPC\Schema\Json;
-use inisire\RPC\Schema\Schema;
-use inisire\RPC\Schema\Stream;
+use inisire\RPC\Schema\Entrypoint;
+use inisire\RPC\Schema\Data;
 use inisire\DataObject\Serializer\ObjectReferenceSerializer;
-use inisire\DataObject\Util\DataMapper;
-use inisire\DataObject\Util\DataTransformer;
+use inisire\DataObject\DataMapper;
+use inisire\DataObject\Reader\ObjectTransformer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,23 +25,23 @@ class HttpBridge
 {
     private DataMapper $mapper;
 
-    private DataTransformer $transformer;
+    private ObjectTransformer $transformer;
 
     public function __construct(ObjectReferenceSerializer $objectReferenceSerializer)
     {
         $this->mapper = new DataMapper();
         $this->mapper->registerSerializer($objectReferenceSerializer);
 
-        $this->transformer = new DataTransformer();
+        $this->transformer = new ObjectTransformer();
         $this->transformer->registerSerializer($objectReferenceSerializer);
     }
 
-    public function resolveRPC(Request $request): RPC
+    public function resolveRPC(Request $request): Entrypoint
     {
         return unserialize($request->attributes->get('_schema'));
     }
 
-    public function createCommand(Request $request, Schema $input, array &$errors): CommandInterface
+    public function createCommand(Request $request, Data $input, array &$errors): CommandInterface
     {
         if ($request->getMethod() === 'GET') {
             $data = $request->query->all();
@@ -63,8 +58,8 @@ class HttpBridge
 
         $rpc = $this->resolveRPC($request);
 
-        if ($rpc->input instanceof Json || $rpc->input instanceof FormData) {
-            $command = $this->mapper->object($rpc->input->schema, $data, $errors);
+        if ($rpc->input->hasSchema()) {
+            $command = $this->mapper->object($rpc->input->getSchema(), $data, $errors);
         } else {
             throw new \RuntimeException(sprintf('RPC "%s" should contain input schema', $rpc->path));
         }
@@ -76,7 +71,7 @@ class HttpBridge
         return $command;
     }
 
-    public function createResponse(ResultInterface $result, Schema $output): Response
+    public function createResponse(ResultInterface $result, Data $output): Response
     {
         if ($result instanceof ErrorResultInterface) {
             $response = $this->createErrorResult($result);
@@ -89,12 +84,20 @@ class HttpBridge
         return $response;
     }
 
-    private function createSuccessResponse(SuccessResultInterface $result, Schema $output)
+    private function createSuccessResponse(SuccessResultInterface $result, Data $output)
     {
         $metadata = $result->getMetadata()->toArray();
 
         $headers = $metadata['http.headers'] ?? [];
         $statusCode = $metadata['http.statusCode'] ?? Response::HTTP_OK;
+
+        if ($output->hasSchema()) {
+            $responseData = $result->getData() !== null
+                ? $this->transformer->any($result->getData(), $output->getSchema())
+                : null;
+        } else {
+            $responseData = $result->getData();
+        }
 
         if ($result instanceof FileStreamResult) {
             $callback = function () use ($result) {
@@ -102,15 +105,13 @@ class HttpBridge
                 flush();
             };
             $response = new StreamedResponse($callback, $statusCode, $headers);
-        } elseif ($output instanceof Json) {
-            $response = new JsonResponse([
-                'data'  => $result->getData() !== null
-                    ? $this->transformer->any($result->getData(), $output->schema)
-                    : null,
-                'error' => null
-            ], Response::HTTP_OK, $headers);
+        } elseif ($result instanceof Result) {
+            $response = match ($output->getContentType()) {
+                'application/json' => new JsonResponse(['data' => $responseData, 'error' => null], $statusCode, $headers),
+                default => new Response($responseData, $statusCode, $headers + ['Content-Type' => $output->getContentType()])
+            };
         } else {
-            throw new \RuntimeException(sprintf("Unsupported result '%'", $result::class));
+            throw new \RuntimeException(sprintf("Unsupported result '%s'", $result::class));
         }
 
         return $response;
@@ -122,7 +123,7 @@ class HttpBridge
             $serializedError = ValidationErrorSerializer::serialize($result);
         } else {
             $serializedError = [
-                'code'    => $result->getCode(),
+                'code' => $result->getCode(),
                 'message' => $result->getMessage()
             ];
         }
@@ -132,7 +133,7 @@ class HttpBridge
         $statusCode = $metadata['http.statusCode'] ?? Response::HTTP_BAD_REQUEST;
 
         return new JsonResponse([
-            'data'  => null,
+            'data' => null,
             'error' => $serializedError
         ], $statusCode, $headers);
     }
