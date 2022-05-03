@@ -2,6 +2,7 @@
 
 namespace inisire\RPC\Bridge;
 
+use inisire\DataObject\DataObjectWizard;
 use inisire\RPC\Bus\CommandInterface;
 use inisire\RPC\Context\RequestContextAwareInterface;
 use inisire\RPC\Error\Serializer\ValidationErrorSerializer;
@@ -13,9 +14,6 @@ use inisire\RPC\Result\ResultInterface;
 use inisire\RPC\Result\SuccessResultInterface;
 use inisire\RPC\Schema\Entrypoint;
 use inisire\RPC\Schema\Data;
-use inisire\DataObject\Serializer\ObjectReferenceSerializer;
-use inisire\DataObject\DataMapper;
-use inisire\DataObject\Reader\ObjectTransformer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,17 +21,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HttpBridge
 {
-    private DataMapper $mapper;
-
-    private ObjectTransformer $transformer;
-
-    public function __construct(ObjectReferenceSerializer $objectReferenceSerializer)
+    public function __construct(
+        private DataObjectWizard $wizard
+    )
     {
-        $this->mapper = new DataMapper();
-        $this->mapper->registerSerializer($objectReferenceSerializer);
-
-        $this->transformer = new ObjectTransformer();
-        $this->transformer->registerSerializer($objectReferenceSerializer);
     }
 
     public function resolveRPC(Request $request): Entrypoint
@@ -49,9 +40,9 @@ class HttpBridge
             // TODO: Check json errors
             $data = json_decode($request->getContent(), true);
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'form') {
-            $data = $request->request->all();
-        } elseif ($request->getMethod() === 'POST') {
             $data = array_merge($request->request->all(), $request->files->all());
+        } elseif ($request->getMethod() === 'POST') {
+            $data = $request->request->all();
         } else {
             $data = [];
         }
@@ -59,7 +50,7 @@ class HttpBridge
         $rpc = $this->resolveRPC($request);
 
         if ($rpc->input->hasSchema()) {
-            $command = $this->mapper->object($rpc->input->getSchema(), $data, $errors);
+            $command = $this->wizard->map($rpc->input->getSchema(), $data, $errors);
         } else {
             throw new \RuntimeException(sprintf('RPC "%s" should contain input schema', $rpc->path));
         }
@@ -93,7 +84,7 @@ class HttpBridge
 
         if ($output->hasSchema()) {
             $responseData = $result->getData() !== null
-                ? $this->transformer->any($result->getData(), $output->getSchema())
+                ? $this->wizard->transform($output->getSchema(), $result->getData())
                 : null;
         } else {
             $responseData = $result->getData();

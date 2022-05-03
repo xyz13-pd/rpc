@@ -4,6 +4,7 @@
 namespace inisire\RPC\DependencyInjection;
 
 
+use inisire\DataObject\Runtime\ObjectLoaderInterface;
 use inisire\RPC\Bus\CommandHandlerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,5 +19,8 @@ class RPCExtension extends \Symfony\Component\DependencyInjection\Extension\Exte
 
         $container->registerForAutoconfiguration(CommandHandlerInterface::class)
             ->addTag('rpc.command_handler');
+
+        $container->registerForAutoconfiguration(ObjectLoaderInterface::class)
+            ->addTag('object_reference.loader');
     }
 }
