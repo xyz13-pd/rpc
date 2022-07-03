@@ -32,7 +32,7 @@ class HttpBridge
         return unserialize($request->attributes->get('_schema'));
     }
 
-    public function createCommand(Request $request, Data $input, array &$errors): CommandInterface
+    public function createCommand(Request $request, Data $input, array &$errors): ?CommandInterface
     {
         if ($request->getMethod() === 'GET') {
             $data = $request->query->all();
@@ -49,13 +49,13 @@ class HttpBridge
 
         $rpc = $this->resolveRPC($request);
 
+        $command = null;
+        
         if ($rpc->input->hasSchema()) {
             $command = $this->wizard->map($rpc->input->getSchema(), $data, $errors);
-        } else {
-            throw new \RuntimeException(sprintf('RPC "%s" should contain input schema', $rpc->path));
         }
 
-        if ($command instanceof RequestContextAwareInterface) {
+        if ($command && $command instanceof RequestContextAwareInterface) {
             $command->applyContext($request);
         }
 

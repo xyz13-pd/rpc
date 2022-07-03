@@ -28,17 +28,19 @@ class BusBridgeController extends AbstractController
 
     private function executeEntrypoint(Entrypoint $rpc, Request $request): Result
     {
-        $errors = [];
-        $command = $this->httpBridge->createCommand($request, $rpc->input, $errors);
+        $mappingErrors = [];
+        $command = $this->httpBridge->createCommand($request, $rpc->input, $mappingErrors);
 
-        if (!empty($errors)) {
-            return new ValidationError($errors);
+        if (!empty($mappingErrors)) {
+            return new ValidationError($mappingErrors);
         }
 
-        $violations = $this->validator->validate($command);
+        if ($command) {
+            $violations = $this->validator->validate($command);
 
-        if ($violations->count() > 0) {
-            return ValidationError::createByViolations($violations);
+            if ($violations->count() > 0) {
+                return ValidationError::createByViolations($violations);
+            }
         }
 
         list ($class, $method) = $request->attributes->get('_command_handler');
@@ -49,7 +51,13 @@ class BusBridgeController extends AbstractController
 
         $service = $this->entrypoints->get($class);
 
-        return call_user_func([$service, $method], $command);
+        if ($command) {
+            $args = [$command];
+        } else {
+            $args = [];
+        }
+
+        return call_user_func_array([$service, $method], $args);
     }
 
     public function __invoke(Request $request)

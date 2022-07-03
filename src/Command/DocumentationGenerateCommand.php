@@ -8,22 +8,29 @@ use inisire\DataObject\OpenAPI\RequestSchema;
 use inisire\DataObject\OpenAPI\ResponseSchema;
 use inisire\DataObject\OpenAPI\SpecificationBuilder;
 use inisire\RPC\Schema\Entrypoint;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-
+#[AsCommand(
+    name: 'rpc:documentation:generate',
+    description: 'Generate OpenAPI schema for RPCs'
+)]
 class DocumentationGenerateCommand extends Command
 {
-    protected static $defaultName = 'rpc:documentation:generate';
-
     private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
         parent::__construct();
         $this->router = $router;
+    }
+
+    protected function configure()
+    {
+        $this->setName('rpc:documentation:generate');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
