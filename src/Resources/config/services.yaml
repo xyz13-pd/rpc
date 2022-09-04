@@ -9,16 +9,15 @@ services:
   inisire\DataObject\:
     resource: '../../../../data-object/src/'
 
-  inisire\RPC\Loader\RouteLoader:
-    arguments: [ !tagged_locator {tag: 'rpc.command_handler'} ]
+  inisire\RPC\Routing\RouteLoader:
     tags: ['routing.loader']
-
-  inisire\RPC\Controller\BusBridgeController:
-    arguments:
-      $entrypoints: !tagged_locator {tag: 'rpc.command_handler'}
 
   inisire\RPC\DataObject\DataSerializerProviderFactory:
     arguments: [ !tagged_locator {tag: 'object_reference.loader'} ]
 
   inisire\DataObject\DataSerializerProvider:
     factory: ['@inisire\RPC\DataObject\DataSerializerProviderFactory', 'create']
+
+  inisire\RPC\Entrypoint\EntrypointRegistry:
+    arguments:
+      $container: !tagged_locator { tag: 'rpc.command_handler' }

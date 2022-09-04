@@ -1,12 +1,13 @@
 <?php
 
 
-namespace inisire\RPC\Command;
+namespace inisire\RPC\Documentation;
 
 
 use inisire\DataObject\OpenAPI\RequestSchema;
 use inisire\DataObject\OpenAPI\ResponseSchema;
 use inisire\DataObject\OpenAPI\SpecificationBuilder;
+use inisire\RPC\Entrypoint\EntrypointRegistry;
 use inisire\RPC\Schema\Entrypoint;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,12 +21,12 @@ use Symfony\Component\Routing\RouterInterface;
 )]
 class DocumentationGenerateCommand extends Command
 {
-    private RouterInterface $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(
+        private EntrypointRegistry $entrypointRegistry,
+        private string $rootPath = '/rpc'
+    )
     {
         parent::__construct();
-        $this->router = $router;
     }
 
     protected function configure()
@@ -35,34 +36,22 @@ class DocumentationGenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $routes = $this->router->getRouteCollection();
-
         $builder = new SpecificationBuilder();
 
-        foreach ($routes->getIterator() as $name => $route) {
-            foreach ($route->getMethods() as $method) {
-                /**
-                 * @var Entrypoint $entrypoint
-                 */
-                $entrypoint = unserialize($route->getDefault('_schema'));
+        foreach ($this->entrypointRegistry->getEntrypoints() as $entrypoint) {
+            $request = null;
+            $responses = [];
 
-                if (!$entrypoint) {
-                    continue;
-                }
-
-                $request = null;
-                $responses = [];
-
-                if ($entrypoint->input->hasSchema()) {
-                    $request = new RequestSchema($entrypoint->input->getContentType(), $entrypoint->input->getSchema());
-                }
-
-                if ($entrypoint->output->hasSchema()) {
-                    $responses[] = new ResponseSchema(200, $entrypoint->output->getContentType(), $entrypoint->output->getSchema());
-                }
-
-                $builder->addPath($method, $route->getPath(), $request, $responses, $entrypoint->tags, $entrypoint->description);
+            if ($entrypoint->getInputSchema()) {
+                $request = new RequestSchema('application/json', $entrypoint->getInputSchema());
             }
+
+            if ($entrypoint->getOutputSchema()) {
+                $responses[] = new ResponseSchema(200, 'application/json', $entrypoint->getOutputSchema());
+            }
+
+            $path = $this->rootPath . '/' . $entrypoint->getName();
+            $builder->addPath('POST', $path, $request, $responses, [], $entrypoint->getDescription() ?? '');
         }
 
         $specification = $builder->getSpecification();

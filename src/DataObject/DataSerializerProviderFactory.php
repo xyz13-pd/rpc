@@ -10,6 +10,7 @@ use inisire\DataObject\Serializer\FileSerializer;
 use inisire\DataObject\Serializer\ObjectReferenceSerializer;
 use inisire\DataObject\Serializer\ObjectSerializer;
 use inisire\DataObject\Serializer\ScalarSerializer;
+use inisire\DataObject\Serializer\UuidSerializer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class DataSerializerProviderFactory
@@ -35,7 +36,8 @@ class DataSerializerProviderFactory
             new FileSerializer(),
             new ObjectSerializer($provider),
             new CollectionSerializer($provider),
-            new ObjectReferenceSerializer($loaders)
+            new ObjectReferenceSerializer($loaders),
+            new UuidSerializer()
         ]);
 
 

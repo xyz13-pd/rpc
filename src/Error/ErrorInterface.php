@@ -1,10 +1,10 @@
 <?php
 
-namespace inisire\RPC\Result;
+namespace inisire\RPC\Error;
 
 use inisire\DataObject\Error\ErrorMessage;
 
-interface ErrorResultInterface extends ResultInterface
+interface ErrorInterface
 {
     public function getCode(): string;
     public function getMessage(): ErrorMessage;

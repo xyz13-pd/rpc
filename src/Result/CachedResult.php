@@ -2,31 +2,48 @@
 
 namespace inisire\RPC\Result;
 
-use inisire\RPC\Http\Headers;
+use inisire\RPC\Http\HttpResultInterface;
 
-class CachedResult extends Result
+class CachedResult implements ResultInterface, HttpResultInterface
 {
     const MODE_PUBLIC = 'public';
     const MODE_PRIVATE = 'private';
     const OPTION_MAX_AGE = 'max-age';
     const OPTION_IMMUTABLE = 'immutable';
 
-    public function __construct(mixed $data, string $mode = self::MODE_PUBLIC, array $options = [])
-    {
-        parent::__construct($data);
+    private array $parts = [];
 
-        $parts = [$mode];
+    public function __construct(
+        private mixed $output,
+        string $mode = self::MODE_PUBLIC,
+        array $options = []
+    )
+    {
+        $this->parts = [$mode];
 
         foreach ($options as $key => $value) {
             if ($value === true) {
-                $parts[] = $key;
+                $this->parts[] = $key;
             } else {
-                $parts[] = sprintf('%s=%s', $key, $value);
+                $this->parts[] = sprintf('%s=%s', $key, $value);
             }
         }
+    }
 
-        $this->getMetadata()->join(new Headers([
-            'Cache-Control' => implode(', ', $parts)
-        ]));
+    public function getHttpCode(): int
+    {
+        return 200;
+    }
+
+    public function getHttpHeaders(): array
+    {
+        return [
+            'Cache-Control' => implode(', ', $this->parts)
+        ];
+    }
+
+    public function getOutput(): mixed
+    {
+        return $this->output;
     }
 }

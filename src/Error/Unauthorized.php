@@ -2,9 +2,13 @@
 
 namespace inisire\RPC\Error;
 
-use inisire\DataObject\Error\ErrorMessage;
 
-class Unauthorized extends HttpError
+use inisire\DataObject\Error\ErrorMessage;
+use inisire\RPC\Http\HttpResultInterface;
+use inisire\RPC\Result\ResultInterface;
+
+
+class Unauthorized implements ErrorInterface, ResultInterface, HttpResultInterface
 {
     public function getCode(): string
     {
@@ -19,5 +23,15 @@ class Unauthorized extends HttpError
     public function getHttpCode(): int
     {
         return 401;
+    }
+
+    public function getHttpHeaders(): array
+    {
+        return [];
+    }
+
+    public function getOutput(): mixed
+    {
+        return null;
     }
 }

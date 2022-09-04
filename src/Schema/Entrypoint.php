@@ -2,23 +2,21 @@
 
 namespace inisire\RPC\Schema;
 
+use inisire\DataObject\Schema\Type\Type;
+
 #[\Attribute]
 class Entrypoint
 {
-    public string $path;
-    public Data $input;
-    public Data $output;
-    public array $tags = [];
-    public string $description = "";
-    public array $methods = ['GET'];
+    public string $name;
+    public ?Type $input = null;
+    public ?Type $output = null;
+    public ?string $description = null;
 
-    public function __construct(string $path, Data $input, Data $output, array $tags = [], string $description = '', array $methods = [])
+    public function __construct(string $name, ?Type $input = null, ?Type $output = null, ?string $description = null)
     {
-        $this->path = $path;
+        $this->name = $name;
         $this->input = $input;
         $this->output = $output;
-        $this->tags = $tags;
         $this->description = $description;
-        $this->methods = $methods;
     }
 }
