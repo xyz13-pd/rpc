@@ -61,7 +61,7 @@ class Entrypoint
 
     public function execute(mixed $parameter, ?CallContext $context): ResultInterface
     {
-        if ($this->validator) {
+        if ($this->validator && $this->getInputSchema() !== null) {
             $violations = $this->validator->validate($parameter);
             if ($violations->count() > 0) {
                 return ValidationError::createByViolations($violations);
