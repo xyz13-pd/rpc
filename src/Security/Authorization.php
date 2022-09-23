@@ -6,13 +6,13 @@ namespace inisire\RPC\Security;
 class Authorization
 {
     public function __construct(
-        private readonly array $roles = []
+        private readonly string $role = 'ROLE_AUTHENTICATED_FULLY'
     )
     {
     }
 
-    public function getRoles(): array
+    public function getRole(): string
     {
-        return $this->roles;
+        return $this->role;
     }
 }

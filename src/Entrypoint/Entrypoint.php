@@ -84,7 +84,7 @@ class Entrypoint
                 throw new \RuntimeException('Security not exists');
             } elseif ($this->security->getUser() === null) {
                 return new Unauthorized();
-            } elseif ($this->security->isGranted($this->getAuthorization()->getRoles()) === false) {
+            } elseif ($this->security->isGranted($this->getAuthorization()->getRole()) === false) {
                 return new AccessDenied();
             }
         }
