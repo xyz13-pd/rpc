@@ -6,22 +6,25 @@ namespace inisire\RPC\Http;
 
 use inisire\DataObject\DataObjectWizard;
 use inisire\RPC\Entrypoint\EntrypointRegistry;
+use inisire\RPC\Error\AccessDenied;
 use inisire\RPC\Error\NotFound;
 use inisire\RPC\Error\ValidationError;
 use inisire\RPC\Http\Context\RequestContext;
 use inisire\RPC\Result\Result;
 use inisire\RPC\Result\ResultInterface;
+use inisire\RPC\Security\Authorization;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 
 class HttpBridgeController extends AbstractController
 {
     public function __construct(
-        private HttpBridge $httpBridge,
-        private DataObjectWizard $wizard,
-        private EntrypointRegistry $entrypointRegistry
+        private HttpBridge         $httpBridge,
+        private DataObjectWizard   $wizard,
+        private EntrypointRegistry $entrypointRegistry,
     )
     {
     }

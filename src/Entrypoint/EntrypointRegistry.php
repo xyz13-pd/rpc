@@ -3,14 +3,17 @@
 namespace inisire\RPC\Entrypoint;
 
 use inisire\RPC\Schema as Schema;
+use inisire\RPC\Security\Authorization;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EntrypointRegistry
 {
     public function __construct(
         private ServiceLocator     $container,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private Security           $security
     )
     {
     }
@@ -49,6 +52,8 @@ class EntrypointRegistry
                      */
                     $entrypoint = $attribute->newInstance();
 
+                    $authorization = $method->getAttributes(Authorization::class)[0] ?? null;
+
                     yield new Entrypoint(
                         $entrypoint->name,
                         $entrypoint->input,
@@ -56,7 +61,9 @@ class EntrypointRegistry
                         $entrypoint->description,
                         $instance,
                         $method->getName(),
-                        $this->validator
+                        $authorization?->newInstance(),
+                        $this->validator,
+                        $this->security
                     );
                 }
             }
