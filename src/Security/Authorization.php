@@ -6,7 +6,7 @@ namespace inisire\RPC\Security;
 class Authorization
 {
     public function __construct(
-        private readonly string $role = 'ROLE_AUTHENTICATED_FULLY'
+        private readonly string $role = 'IS_AUTHENTICATED_FULLY'
     )
     {
     }
