@@ -58,10 +58,8 @@ class HttpBridge
                 }
             };
             $response = new StreamedResponse($callback, $statusCode, $headers);
-        } elseif (is_array($output) || is_scalar($output)) {
+        } elseif (is_array($output) || is_scalar($output) || is_null($output)) {
             $response = new JsonResponse(['data' => $output, 'error' => null], $statusCode, $headers);
-        } elseif (is_null($output)) {
-            $response = new Response(null, $statusCode, $headers);
         } else {
             throw new \RuntimeException(sprintf("Unsupported result output type '%s'", is_object($output) ? $output::class : gettype($output)));
         }
