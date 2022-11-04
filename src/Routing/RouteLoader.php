@@ -27,7 +27,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return new RouteCollection();
     }
 
-    public function load($resource, string $type = null)
+    public function load($resource, $type = null)
     {
         $collection = new RouteCollection();
 
@@ -40,7 +40,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return $collection;
     }
 
-    public function supports($resource, string $type = null)
+    public function supports($resource, $type = null)
     {
         return $type === 'rpc';
     }
