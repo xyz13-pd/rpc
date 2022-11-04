@@ -12,6 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand('rpc:debug:list')]
 class ListEntrypointCommand extends Command
 {
+    protected static $defaultName = 'rpc:debug:list';
+    
     public function __construct(
         private EntrypointRegistry $entrypointRegistry
     )

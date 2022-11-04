@@ -17,7 +17,9 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         string $env = null
     )
     {
-        parent::__construct($env);
+        if (method_exists(Loader::class, '__construct')) {
+            parent::__construct($env);
+        }
     }
 
     public function __invoke()
@@ -25,7 +27,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return new RouteCollection();
     }
 
-    public function load($resource, string $type = null)
+    public function load($resource, $type = null)
     {
         $collection = new RouteCollection();
 
@@ -38,7 +40,7 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         return $collection;
     }
 
-    public function supports($resource, string $type = null)
+    public function supports($resource, $type = null)
     {
         return $type === 'rpc';
     }
