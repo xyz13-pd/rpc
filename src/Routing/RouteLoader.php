@@ -17,7 +17,9 @@ class RouteLoader extends Loader implements RouteLoaderInterface
         string $env = null
     )
     {
-        parent::__construct($env);
+        if (method_exists(Loader::class, '__construct')) {
+            parent::__construct($env);
+        }
     }
 
     public function __invoke()
