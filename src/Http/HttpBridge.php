@@ -23,10 +23,8 @@ class HttpBridge
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'json') {
             // TODO: Check json errors
             $data = json_decode($request->getContent(), true);
-        } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'form') {
-            $data = array_merge($request->request->all(), $request->files->all());
         } elseif ($request->getMethod() === 'POST') {
-            $data = $request->request->all();
+            $data = array_merge($request->request->all(), $request->files->all());
         } else {
             $data = [];
         }

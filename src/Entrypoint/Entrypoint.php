@@ -89,7 +89,15 @@ class Entrypoint
             }
         }
 
-        $result = call_user_func_array($this->getCallable(), [$parameter, $context]);
+        $arguments = [];
+        foreach ([$parameter, $context] as $argument) {
+            if ($argument === null) {
+                continue;
+            }
+            $arguments[] = $argument;
+        }
+
+        $result = call_user_func_array($this->getCallable(), $arguments);
 
         if (!$result instanceof ResultInterface) {
             $result = new Result($result);
