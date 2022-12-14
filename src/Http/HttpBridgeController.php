@@ -7,13 +7,17 @@ namespace inisire\RPC\Http;
 use inisire\DataObject\DataObjectWizard;
 use inisire\RPC\Entrypoint\EntrypointRegistry;
 use inisire\RPC\Error\AccessDenied;
+use inisire\RPC\Error\DebugServerError;
+use inisire\RPC\Error\ErrorInterface;
 use inisire\RPC\Error\NotFound;
+use inisire\RPC\Error\ServerError;
 use inisire\RPC\Error\ValidationError;
 use inisire\RPC\Http\Context\RequestContext;
 use inisire\RPC\Result\Result;
 use inisire\RPC\Result\ResultInterface;
 use inisire\RPC\Security\Authorization;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
@@ -22,9 +26,10 @@ use Symfony\Component\Security\Core\Security;
 class HttpBridgeController extends AbstractController
 {
     public function __construct(
-        private HttpBridge         $httpBridge,
-        private DataObjectWizard   $wizard,
-        private EntrypointRegistry $entrypointRegistry,
+        private HttpBridge            $httpBridge,
+        private DataObjectWizard      $wizard,
+        private EntrypointRegistry    $entrypointRegistry,
+        private ParameterBagInterface $parameters
     )
     {
     }
@@ -60,9 +65,17 @@ class HttpBridgeController extends AbstractController
             }
         }
 
-        $result = $entrypoint->execute($parameter, new RequestContext($request, $this->getUser()));
+        try {
+            $result = $entrypoint->execute($parameter, new RequestContext($request, $this->getUser()));
+        } catch (\Exception|\Error $error) {
+            if ($this->parameters->get('kernel.debug') === true) {
+                $result = new DebugServerError($error);
+            } else {
+                $result = new ServerError($error);
+            }
+        }
 
-        if ($result->getOutput() !== null && $entrypoint->getOutputSchema()) {
+        if ($result->getOutput() !== null && $result instanceof ErrorInterface === false && $entrypoint->getOutputSchema()) {
             $output = $this->wizard->transform($entrypoint->getOutputSchema(), $result->getOutput());
             $result = new Result($output);
         }

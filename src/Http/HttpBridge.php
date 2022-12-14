@@ -73,7 +73,8 @@ class HttpBridge
         } else {
             $serializedError = [
                 'code' => $error->getCode(),
-                'message' => $error->getMessage()
+                'message' => $error->getMessage(),
+                'data' => $error instanceof ResultInterface ? $error->getOutput() : null
             ];
         }
 
