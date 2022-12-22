@@ -24,7 +24,7 @@ class HttpBridge
             // TODO: Check json errors
             $data = json_decode($request->getContent(), true);
         } elseif ($request->getMethod() === 'POST') {
-            $data = array_merge($request->request->all(), $request->files->all());
+            $data = array_merge_recursive($request->request->all(), $request->files->all());
         } else {
             $data = [];
         }
