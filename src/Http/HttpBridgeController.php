@@ -16,9 +16,15 @@ use inisire\RPC\Http\Context\RequestContext;
 use inisire\RPC\Result\Result;
 use inisire\RPC\Result\ResultInterface;
 use inisire\RPC\Security\Authorization;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -26,10 +32,12 @@ use Symfony\Component\Security\Core\Security;
 class HttpBridgeController extends AbstractController
 {
     public function __construct(
-        private HttpBridge            $httpBridge,
-        private DataObjectWizard      $wizard,
-        private EntrypointRegistry    $entrypointRegistry,
-        private ParameterBagInterface $parameters
+        private HttpBridge               $httpBridge,
+        private DataObjectWizard         $wizard,
+        private EntrypointRegistry       $entrypointRegistry,
+        private ParameterBagInterface    $parameters,
+        private EventDispatcherInterface $dispatcher,
+        private HttpKernelInterface      $kernel
     )
     {
     }
@@ -68,6 +76,9 @@ class HttpBridgeController extends AbstractController
         try {
             $result = $entrypoint->execute($parameter, new RequestContext($request, $this->getUser()));
         } catch (\Exception|\Error $error) {
+            $event = new ExceptionEvent($this->kernel, $request, HttpKernel::MAIN_REQUEST, $error);
+            $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+
             if ($this->parameters->get('kernel.debug') === true) {
                 $result = new DebugServerError($error);
             } else {

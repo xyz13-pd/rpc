@@ -16,15 +16,28 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HttpBridge
 {
+    private function mergeRequestParts(array $a, array $b): array
+    {
+        foreach ($b as $k => $v) {
+            if (array_key_exists($k, $a) && is_array($a[$k]) && is_array($b[$k])) {
+                $a[$k] = $this->mergeRequestParts($a[$k], $b[$k]);
+            } else {
+                $a[$k] = $v;
+            }
+        }
+
+        return $a;
+    }
+    
     public function extractRequestData(Request $request): array
     {
         if ($request->getMethod() === 'GET') {
             $data = $request->query->all();
         } elseif ($request->getMethod() === 'POST' && $request->getContentType() == 'json') {
             // TODO: Check json errors
-            $data = json_decode($request->getContent(), true);
+            $data = json_decode($request->getContent(), true) ?? [];
         } elseif ($request->getMethod() === 'POST') {
-            $data = array_merge_recursive($request->request->all(), $request->files->all());
+            $data = $this->mergeRequestParts($request->request->all(), $request->files->all());
         } else {
             $data = [];
         }
