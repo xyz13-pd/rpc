@@ -11,6 +11,7 @@ use inisire\RPC\Entrypoint\EntrypointRegistry;
 use inisire\RPC\Schema\Entrypoint;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -23,7 +24,7 @@ class DocumentationGenerateCommand extends Command
 {
     public function __construct(
         private EntrypointRegistry $entrypointRegistry,
-        private string $rootPath = '/rpc'
+        private string             $rootPath = '/rpc'
     )
     {
         parent::__construct();
@@ -32,6 +33,7 @@ class DocumentationGenerateCommand extends Command
     protected function configure()
     {
         $this->setName('rpc:documentation:generate');
+        $this->addArgument('path', InputArgument::OPTIONAL, 'path', 'swagger.json');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -57,9 +59,15 @@ class DocumentationGenerateCommand extends Command
         $specification = $builder->getSpecification();
 
         $content = json_encode($specification->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        file_put_contents('swagger.json', $content);
 
-        echo $content . PHP_EOL;
+        if ($output->isVeryVerbose()) {
+            echo $content . PHP_EOL;
+        }
+
+        $path = $input->getArgument('path');
+        file_put_contents($path, $content);
+
+        $output->writeln(sprintf('Generated: %s', $path));
 
         return 0;
     }
