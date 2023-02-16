@@ -5,7 +5,7 @@ namespace inisire\RPC\Result;
 
 use inisire\RPC\Http\HttpResultInterface;
 
-class Result implements ResultInterface, HttpResultInterface
+class Result implements ResultInterface, HttpResultInterface, MutableOutputInterface
 {
     public function __construct(
         private mixed $output,
@@ -26,5 +26,10 @@ class Result implements ResultInterface, HttpResultInterface
     public function getHttpHeaders(): array
     {
         return [];
+    }
+
+    public function setOutput(mixed $output)
+    {
+        $this->output = $output;
     }
 }

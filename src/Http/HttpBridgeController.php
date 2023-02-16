@@ -13,6 +13,7 @@ use inisire\RPC\Error\NotFound;
 use inisire\RPC\Error\ServerError;
 use inisire\RPC\Error\ValidationError;
 use inisire\RPC\Http\Context\RequestContext;
+use inisire\RPC\Result\MutableOutputInterface;
 use inisire\RPC\Result\Result;
 use inisire\RPC\Result\ResultInterface;
 use inisire\RPC\Security\Authorization;
@@ -89,6 +90,15 @@ class HttpBridgeController extends AbstractController
         if ($result->getOutput() !== null && $result instanceof ErrorInterface === false && $entrypoint->getOutputSchema()) {
             $output = $this->wizard->transform($entrypoint->getOutputSchema(), $result->getOutput());
             $result = new Result($output);
+        }
+
+        if ($result->getOutput() === null || $result instanceof ErrorInterface) {
+            return $result;
+        }
+
+        if ($entrypoint->getOutputSchema() && $result->getOutput() instanceof MutableOutputInterface) {
+            $output = $this->wizard->transform($entrypoint->getOutputSchema(), $result->getOutput());
+            $result->setOutput($output);
         }
 
         return $result;

@@ -4,7 +4,7 @@ namespace inisire\RPC\Result;
 
 use inisire\RPC\Http\HttpResultInterface;
 
-class CachedResult implements ResultInterface, HttpResultInterface
+class CachedResult implements ResultInterface, HttpResultInterface, MutableOutputInterface
 {
     const MODE_PUBLIC = 'public';
     const MODE_PRIVATE = 'private';
@@ -45,5 +45,10 @@ class CachedResult implements ResultInterface, HttpResultInterface
     public function getOutput(): mixed
     {
         return $this->output;
+    }
+
+    public function setOutput(mixed $output)
+    {
+        $this->output = $output;
     }
 }
